@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Қоштасу кешіне шақыру</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C8951A;
+    --gold-light: #F0C040;
+    --gold-pale: #F7E09A;
+    --crimson: #8B1A1A;
+    --dark: #0D0805;
+    --deep-blue: #0A1628;
+    --cream: #FDF6E3;
+    --ornament: #D4A017;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background-color: var(--dark);
+    color: var(--cream);
+    font-family: 'Cormorant Garamond', serif;
+    overflow-x: hidden;
+  }
+
+  /* ──────── SVG ORNAMENT PATTERN ──────── */
+  .kazakh-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse at 50% 0%, #2a1200 0%, transparent 60%),
+      radial-gradient(ellipse at 0% 100%, #1a0a00 0%, transparent 50%),
+      radial-gradient(ellipse at 100% 100%, #200800 0%, transparent 50%),
+      #0D0805;
+    opacity: 1;
+  }
+
+  .kazakh-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23C8951A' stroke-width='0.6' opacity='0.18'%3E%3Crect x='10' y='10' width='100' height='100' rx='4'/%3E%3Cpath d='M60 10 L110 60 L60 110 L10 60 Z'/%3E%3Ccircle cx='60' cy='60' r='25'/%3E%3Cpath d='M60 35 L75 50 L70 60 L75 70 L60 85 L45 70 L50 60 L45 50 Z'/%3E%3Cpath d='M10 60 L35 45 M10 60 L35 75 M110 60 L85 45 M110 60 L85 75 M60 10 L45 35 M60 10 L75 35 M60 110 L45 85 M60 110 L75 85'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 120px 120px;
+  }
+
+  /* ──────── PARTICLES ──────── */
+  .sparks {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .spark {
+    position: absolute;
+    width: 3px; height: 3px;
+    border-radius: 50%;
+    background: var(--gold-light);
+    animation: float linear infinite;
+  }
+  @keyframes float {
+    0%   { transform: translateY(110vh) translateX(0) scale(1); opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 1; }
+    100% { transform: translateY(-10vh) translateX(var(--dx)) scale(0.3); opacity: 0; }
+  }
+
+  /* ──────── WRAPPER ──────── */
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ──────── HERO ──────── */
+  .hero {
+    width: 100%;
+    max-width: 960px;
+    padding: 60px 24px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    animation: fadeDown 1.2s ease both;
+  }
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .top-ornament {
+    width: 320px;
+    max-width: 90vw;
+    margin-bottom: 28px;
+    filter: drop-shadow(0 0 12px rgba(200,149,26,0.6));
+    animation: pulse 3s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { filter: drop-shadow(0 0 12px rgba(200,149,26,0.5)); }
+    50%      { filter: drop-shadow(0 0 22px rgba(240,192,64,0.9)); }
+  }
+
+  .label {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(9px, 2vw, 13px);
+    letter-spacing: 6px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  .invite-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(26px, 5.5vw, 58px);
+    line-height: 1.15;
+    background: linear-gradient(135deg, var(--gold-pale) 0%, var(--gold-light) 40%, var(--gold) 70%, #8B5E00 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+    text-shadow: none;
+    filter: drop-shadow(0 2px 10px rgba(200,149,26,0.5));
+  }
+
+  .subtitle {
+    font-size: clamp(15px, 2.5vw, 22px);
+    color: var(--gold-pale);
+    letter-spacing: 2px;
+    margin-bottom: 36px;
+    font-style: italic;
+  }
+
+  /* ──────── DIVIDER ──────── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto 44px;
+  }
+  .divider-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .divider-gem {
+    width: 10px; height: 10px;
+    background: var(--gold-light);
+    transform: rotate(45deg);
+    flex-shrink: 0;
+    box-shadow: 0 0 10px var(--gold-light);
+  }
+
+  /* ──────── PHOTO CARD ──────── */
+  .photo-section {
+    animation: fadeUp 1.4s 0.3s ease both;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 50px;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .photo-frame-outer {
+    position: relative;
+    padding: 6px;
+    background: linear-gradient(135deg, var(--gold-light), var(--gold), #6B3A00, var(--gold-light));
+    border-radius: 4px;
+    box-shadow: 0 0 40px rgba(200,149,26,0.4), inset 0 0 20px rgba(0,0,0,0.5);
+  }
+
+  .photo-frame-inner {
+    padding: 10px;
+    background: linear-gradient(135deg, #1a0a00, #2d1500, #1a0a00);
+    border-radius: 2px;
+  }
+
+  .photo-placeholder {
+    width: 260px;
+    height: 300px;
+    object-fit: cover;
+    display: block;
+    border-radius: 2px;
+    background: linear-gradient(160deg, #2d1a00 0%, #1a0d00 100%);
+    position: relative;
+  }
+
+  /* Placeholder icon when no real photo */
+  .photo-placeholder-inner {
+    width: 260px;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(160deg, #2d1a00 0%, #1a0d00 100%);
+    border-radius: 2px;
+    gap: 12px;
+    cursor: pointer;
+    transition: background 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .photo-placeholder-inner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='none' stroke='%23C8951A' stroke-width='0.5' opacity='0.15'%3E%3Crect x='5' y='5' width='50' height='50'/%3E%3Cpath d='M30 5 L55 30 L30 55 L5 30 Z'/%3E%3Ccircle cx='30' cy='30' r='12'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 60px 60px;
+  }
+  .photo-placeholder-inner svg {
+    z-index: 1;
+    opacity: 0.6;
+    filter: drop-shadow(0 0 8px var(--gold));
+  }
+  .photo-placeholder-inner span {
+    font-size: 12px;
+    color: var(--gold);
+    opacity: 0.8;
+    letter-spacing: 1px;
+    z-index: 1;
+    text-align: center;
+    padding: 0 16px;
+  }
+  .photo-placeholder-inner:hover { background: linear-gradient(160deg, #3d2500 0%, #2a1200 100%); }
+
+  /* Corner ornaments on frame */
+  .corner {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+  }
+  .corner-tl { top: -2px; left: -2px; }
+  .corner-tr { top: -2px; right: -2px; transform: scaleX(-1); }
+  .corner-bl { bottom: -2px; left: -2px; transform: scaleY(-1); }
+  .corner-br { bottom: -2px; right: -2px; transform: scale(-1); }
+
+  .curator-name {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(18px, 3.5vw, 30px);
+    color: var(--gold-light);
+    margin-top: 22px;
+    letter-spacing: 3px;
+    filter: drop-shadow(0 0 8px rgba(240,192,64,0.5));
+  }
+  .curator-role {
+    font-size: clamp(13px, 2vw, 17px);
+    color: var(--gold);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-top: 6px;
+    font-style: italic;
+  }
+
+  /* ──────── INFO CARDS ──────── */
+  .cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    width: 100%;
+    max-width: 900px;
+    padding: 0 24px;
+    margin-bottom: 50px;
+    animation: fadeUp 1.4s 0.6s ease both;
+  }
+
+  .card {
+    flex: 1 1 200px;
+    max-width: 240px;
+    background: linear-gradient(160deg, rgba(40,18,4,0.9), rgba(20,8,0,0.95));
+    border: 1px solid rgba(200,149,26,0.35);
+    padding: 28px 22px;
+    text-align: center;
+    position: relative;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border: 1px solid transparent;
+    background: linear-gradient(135deg, var(--gold-light), transparent 50%, var(--gold)) border-box;
+    -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: destination-out;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(200,149,26,0.25); }
+  .card:hover::before { opacity: 1; }
+
+  .card-icon {
+    font-size: 30px;
+    margin-bottom: 12px;
+    filter: drop-shadow(0 0 8px var(--gold));
+  }
+  .card-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .card-value {
+    font-size: clamp(16px, 2.5vw, 20px);
+    color: var(--gold-pale);
+    line-height: 1.4;
+  }
+
+  /* ──────── MESSAGE ──────── */
+  .message-section {
+    max-width: 700px;
+    padding: 0 24px 50px;
+    text-align: center;
+    animation: fadeUp 1.4s 0.9s ease both;
+  }
+
+  .message-box {
+    background: linear-gradient(160deg, rgba(40,18,4,0.85), rgba(20,8,0,0.9));
+    border: 1px solid rgba(200,149,26,0.3);
+    padding: 40px 36px;
+    position: relative;
+  }
+  .message-box::after {
+    content: '❖';
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--dark);
+    padding: 0 8px;
+    color: var(--gold);
+    font-size: 18px;
+  }
+
+  .quote-mark {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 60px;
+    color: var(--gold);
+    opacity: 0.3;
+    line-height: 0.5;
+    display: block;
+    margin-bottom: 16px;
+  }
+  .message-text {
+    font-size: clamp(16px, 2.2vw, 20px);
+    line-height: 1.85;
+    color: var(--cream);
+    font-style: italic;
+  }
+
+  /* ──────── CTA ──────── */
+  .cta-section {
+    padding: 20px 24px 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    animation: fadeUp 1.4s 1.1s ease both;
+  }
+
+  .cta-btn {
+    display: inline-block;
+    padding: 16px 48px;
+    background: linear-gradient(135deg, #8B5E00, var(--gold), #8B5E00);
+    background-size: 200% 100%;
+    color: var(--dark);
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(11px, 2vw, 14px);
+    letter-spacing: 4px;
+    text-decoration: none;
+    text-transform: uppercase;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    transition: background-position 0.5s, box-shadow 0.3s;
+    box-shadow: 0 4px 20px rgba(200,149,26,0.4);
+    clip-path: polygon(12px 0, calc(100% - 12px) 0, 100% 50%, calc(100% - 12px) 100%, 12px 100%, 0 50%);
+  }
+  .cta-btn:hover {
+    background-position: 100% 0;
+    box-shadow: 0 6px 30px rgba(240,192,64,0.7);
+  }
+
+  .rsvp-note {
+    font-size: 14px;
+    color: var(--gold);
+    opacity: 0.7;
+    letter-spacing: 2px;
+  }
+
+  /* ──────── BOTTOM ORNAMENT ──────── */
+  .bottom-ornament {
+    width: 100%;
+    max-width: 960px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    padding: 0 24px 30px;
+    gap: 8px;
+  }
+  .bottom-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(200,149,26,0.5), rgba(200,149,26,0.5), transparent);
+  }
+
+  /* ──────── FILE UPLOAD (hidden) ──────── */
+  #photoUpload { display: none; }
+
+  /* Photo when uploaded */
+  .curator-photo {
+    width: 260px;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 2px;
+    display: block;
+  }
+
+  /* Countdown */
+  .countdown {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 10px;
+  }
+  .countdown-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(40,18,4,0.8);
+    border: 1px solid rgba(200,149,26,0.3);
+    padding: 12px 18px;
+    min-width: 70px;
+  }
+  .countdown-num {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(20px, 4vw, 32px);
+    color: var(--gold-light);
+    line-height: 1;
+  }
+  .countdown-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Background -->
+<div class="kazakh-bg"></div>
+
+<!-- Floating sparks -->
+<div class="sparks" id="sparks"></div>
+
+<div class="wrapper">
+
+  <!-- HERO -->
+  <section class="hero">
+
+    <!-- Top SVG ornament -->
+    <svg class="top-ornament" viewBox="0 0 320 80" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="og" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#F7E09A"/>
+          <stop offset="40%" stop-color="#F0C040"/>
+          <stop offset="70%" stop-color="#C8951A"/>
+          <stop offset="100%" stop-color="#F7E09A"/>
+        </linearGradient>
+      </defs>
+      <!-- Center sun/star -->
+      <g transform="translate(160,40)">
+        <polygon points="0,-22 5,-8 20,-8 9,2 14,16 0,7 -14,16 -9,2 -20,-8 -5,-8" fill="url(#og)" opacity="0.95"/>
+        <circle cx="0" cy="0" r="7" fill="url(#og)" opacity="0.8"/>
+      </g>
+      <!-- Left branch -->
+      <g stroke="url(#og)" fill="none" stroke-width="1.5">
+        <path d="M140,40 Q120,25 100,20 Q80,15 60,18"/>
+        <path d="M120,32 Q110,22 100,20"/>
+        <path d="M100,20 Q95,12 88,10"/>
+        <path d="M100,20 Q92,26 85,28"/>
+        <circle cx="60" cy="18" r="4" fill="url(#og)" stroke="none"/>
+        <circle cx="88" cy="10" r="3" fill="url(#og)" stroke="none"/>
+        <circle cx="85" cy="28" r="3" fill="url(#og)" stroke="none"/>
+        <!-- Far left -->
+        <path d="M60,18 Q40,12 20,16"/>
+        <path d="M40,15 Q35,8 28,8"/>
+        <path d="M40,15 Q36,22 30,25"/>
+        <circle cx="20" cy="16" r="3" fill="url(#og)" stroke="none"/>
+        <circle cx="28" cy="8" r="2.5" fill="url(#og)" stroke="none"/>
+        <circle cx="30" cy="25" r="2.5" fill="url(#og)" stroke="none"/>
+      </g>
+      <!-- Right branch (mirror) -->
+      <g stroke="url(#og)" fill="none" stroke-width="1.5">
+        <path d="M180,40 Q200,25 220,20 Q240,15 260,18"/>
+        <path d="M200,32 Q210,22 220,20"/>
+        <path d="M220,20 Q225,12 232,10"/>
+        <path d="M220,20 Q228,26 235,28"/>
+        <circle cx="260" cy="18" r="4" fill="url(#og)" stroke="none"/>
+        <circle cx="232" cy="10" r="3" fill="url(#og)" stroke="none"/>
+        <circle cx="235" cy="28" r="3" fill="url(#og)" stroke="none"/>
+        <path d="M260,18 Q280,12 300,16"/>
+        <path d="M280,15 Q285,8 292,8"/>
+        <path d="M280,15 Q284,22 290,25"/>
+        <circle cx="300" cy="16" r="3" fill="url(#og)" stroke="none"/>
+        <circle cx="292" cy="8" r="2.5" fill="url(#og)" stroke="none"/>
+        <circle cx="290" cy="25" r="2.5" fill="url(#og)" stroke="none"/>
+      </g>
+    </svg>
+
+    <p class="label">Сізді шын жүректен</p>
+    <h1 class="invite-title">Қоштасу кешіне шақырамыз</h1>
+    <p class="subtitle">Сіздің любимый оқушыларыңыздан</p>
+
+    <!-- Countdown -->
+    <div class="countdown" id="countdown">
+      <div class="countdown-item"><span class="countdown-num" id="d-days">00</span><span class="countdown-label">Күн</span></div>
+      <div class="countdown-item"><span class="countdown-num" id="d-hours">00</span><span class="countdown-label">Сағат</span></div>
+      <div class="countdown-item"><span class="countdown-num" id="d-mins">00</span><span class="countdown-label">Минут</span></div>
+      <div class="countdown-item"><span class="countdown-num" id="d-secs">00</span><span class="countdown-label">Секунд</span></div>
+    </div>
+
+    <div class="divider"><div class="divider-line"></div><div class="divider-gem"></div><div class="divider-line"></div></div>
+  </section>
+
+  <!-- PHOTO -->
+  <section class="photo-section">
+    <div class="photo-frame-outer">
+      <!-- Corner decorations -->
+      <svg class="corner corner-tl" viewBox="0 0 24 24"><path d="M0 24 L0 4 Q0 0 4 0 L24 0" stroke="#F0C040" stroke-width="2" fill="none"/><circle cx="4" cy="4" r="2.5" fill="#F0C040"/></svg>
+      <svg class="corner corner-tr" viewBox="0 0 24 24"><path d="M0 24 L0 4 Q0 0 4 0 L24 0" stroke="#F0C040" stroke-width="2" fill="none"/><circle cx="4" cy="4" r="2.5" fill="#F0C040"/></svg>
+      <svg class="corner corner-bl" viewBox="0 0 24 24"><path d="M0 24 L0 4 Q0 0 4 0 L24 0" stroke="#F0C040" stroke-width="2" fill="none"/><circle cx="4" cy="4" r="2.5" fill="#F0C040"/></svg>
+      <svg class="corner corner-br" viewBox="0 0 24 24"><path d="M0 24 L0 4 Q0 0 4 0 L24 0" stroke="#F0C040" stroke-width="2" fill="none"/><circle cx="4" cy="4" r="2.5" fill="#F0C040"/></svg>
+
+      <div class="photo-frame-inner">
+        <div id="photoContainer">
+          <div class="photo-placeholder-inner" onclick="document.getElementById('photoUpload').click()">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+              <circle cx="24" cy="18" r="10" stroke="#C8951A" stroke-width="1.5"/>
+              <path d="M6 42 C6 32 42 32 42 42" stroke="#C8951A" stroke-width="1.5"/>
+              <path d="M34 10 L34 20 M29 15 L39 15" stroke="#F0C040" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <span>Мна жерге білдіртпи Т 31 дің фотосын қойып жбересізғой</span>
+          </div>
+        </div>
+        <input type="file" id="photoUpload" accept="image/*">
+      </div>
+    </div>
+
+    <h2 class="curator-name" id="curatorName">Жанека апайдың үздіктері</h2>
+    <p class="curator-role">❤️✨💝💞</p>
+  </section>
+
+  <!-- INFO CARDS -->
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">🕯️</div>
+      <p class="card-title">Күн</p>
+      <p class="card-value" id="eventDate">7 Наурыз<br>2026</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">⏰</div>
+      <p class="card-title">Уақыт</p>
+      <p class="card-value">20:00</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🏛️</div>
+      <p class="card-title">Орын</p>
+      <p class="card-value">Өзіміздің мидтта<br></p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🌟</div>
+      <p class="card-title"></p>
+      <p class="card-value">Күшті кештен қалып қоймаңыз<br></p>
+    </div>
+  </div>
+
+  <!-- MESSAGE -->
+  <section class="message-section">
+    <div class="message-box">
+      <span class="quote-mark">❝</span>
+      <p class="message-text">
+        Сізді біздің топтың сүйікті куратор мерекесіне шақырамыз. Бұл кеш — ол адамға деген шексіз құрмет пен алғыстың белгісі. Бірге болайық, ұлы дала рухымен тойлайық!
+      </p>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <button class="cta-btn" onclick="confirmAttend()">Қатысамын ✦</button>
+    <p class="rsvp-label rsvp-note">Қатыспасаңыз ренжиміз😡😠</p>
+  </div>
+
+  <!-- Bottom ornament -->
+  <div class="bottom-ornament"><div class="bottom-line"></div></div>
+
+</div>
+
+<!-- Edit panel -->
+<div style="position:fixed;bottom:16px;right:16px;z-index:100;display:flex;flex-direction:column;gap:8px;align-items:flex-end;">
+  <button onclick="editName()" style="background:rgba(40,18,4,0.9);border:1px solid rgba(200,149,26,0.5);color:#F0C040;font-family:'Cormorant Garamond',serif;font-size:13px;padding:8px 14px;cursor:pointer;letter-spacing:1px;"></button>
+  <button onclick="editDate()" style="background:rgba(40,18,4,0.9);border:1px solid rgba(200,149,26,0.5);color:#F0C040;font-family:'Cormorant Garamond',serif;font-size:13px;padding:8px 14px;cursor:pointer;letter-spacing:1px;"></button>
+</div>
+
+<script>
+// Sparks
+const sc = document.getElementById('sparks');
+for(let i=0;i<35;i++){
+  const s = document.createElement('div');
+  s.className = 'spark';
+  const left = Math.random()*100;
+  const dur = 6 + Math.random()*10;
+  const delay = Math.random()*12;
+  const dx = (Math.random()-0.5)*200;
+  const size = 1+Math.random()*3;
+  s.style.cssText = `left:${left}%;width:${size}px;height:${size}px;--dx:${dx}px;animation-duration:${dur}s;animation-delay:-${delay}s;opacity:${0.4+Math.random()*0.6};background:${Math.random()>0.5?'#F0C040':'#C8951A'}`;
+  sc.appendChild(s);
+}
+
+// Photo upload
+document.getElementById('photoUpload').addEventListener('change', function(e){
+  const f = e.target.files[0];
+  if(!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    const img = document.createElement('img');
+    img.src = ev.target.result;
+    img.className = 'curator-photo';
+    img.alt = 'Куратор фотосы';
+    const c = document.getElementById('photoContainer');
+    c.innerHTML = '';
+    c.appendChild(img);
+  };
+  r.readAsDataURL(f);
+});
+
+// Countdown — target date
+const target = new Date('2026-03-07T20:00:00');
+function updateCountdown(){
+  const now = new Date();
+  const diff = target - now;
+  if(diff <= 0){
+    document.getElementById('d-days').textContent='00';
+    document.getElementById('d-hours').textContent='00';
+    document.getElementById('d-mins').textContent='00';
+    document.getElementById('d-secs').textContent='00';
+    return;
+  }
+  const days = Math.floor(diff/86400000);
+  const hrs  = Math.floor((diff%86400000)/3600000);
+  const mins = Math.floor((diff%3600000)/60000);
+  const secs = Math.floor((diff%60000)/1000);
+  document.getElementById('d-days').textContent  = String(days).padStart(2,'0');
+  document.getElementById('d-hours').textContent = String(hrs).padStart(2,'0');
+  document.getElementById('d-mins').textContent  = String(mins).padStart(2,'0');
+  document.getElementById('d-secs').textContent  = String(secs).padStart(2,'0');
+}
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+function confirmAttend(){
+  const btn = document.querySelector('.cta-btn');
+  btn.textContent = '✦ Ай леееев ай тигррр Все күтеміз сізді 🤗🤗 ✦';
+  btn.style.background = 'linear-gradient(135deg,#2d6b00,#5a9e00,#2d6b00)';
+  btn.style.clipPath = 'none';
+  btn.style.borderRadius = '4px';
+}
+
+function editName(){
+  const n = prompt('Куратордың аты-жөнін енгізіңіз:');
+  if(n) document.getElementById('curatorName').textContent = n;
+}
+function editDate(){
+  const d = prompt('Іс-шара күнін енгізіңіз (мысалы: 20 Сәуір 2025):');
+  if(d) document.getElementById('eventDate').innerHTML = d.replace(' ', '<br>');
+}
+</script>
+</body>
+</html>
